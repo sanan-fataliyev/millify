@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -53,7 +55,10 @@ namespace Millify
 
         private static int VowelIndex(char c)
         {
-            return IndexOfInsentensive(AzeVowelsUpper, c);
+            var index = AzeVowelsUpper.IndexOf(c);
+            if(index == -1)
+                index = AzeVowelsLower.IndexOf(c);
+            return index;
         }
 
         private static bool IsVowel(char c)
@@ -153,8 +158,8 @@ namespace Millify
 
                 var numberSpelling = NumberToWord(long.Parse(num));
 
-                var fixedTail = FixHarmony(tail, numberSpelling);
-                result.Append(fixedTail);
+                var fixedConcat = ConcatWithHarmony(numberSpelling, tail);
+                result.Append(fixedConcat.Substring(fixedConcat.Length-tail.Length));
                 uponToIndex = match.Index + match.Length;
             }
             result.Append(str.Substring(uponToIndex));
@@ -164,7 +169,7 @@ namespace Millify
         }
 
         //ahəng qanunu. 
-        public static string FixHarmony(string corruptPhrase, string following)
+        public static string ConcatWithHarmony(string root, string following)
         {
             //2011-cidən başlayaraq
             //2010-cudan başlayaraq
@@ -176,7 +181,7 @@ namespace Millify
             //üç-cüdən başlayaraq
             //altı-cıdan başlayaraq
 
-            var lastVowel = following.GetLastVowel();
+            var lastVowel = root.GetLastVowel();
 
             var lastVowelInfos = lastVowel.GetCharInfos();
 
@@ -209,13 +214,13 @@ namespace Millify
                 char twinChar = lastVowelInfos.HasFlag(CharInfos.İncə) ? 'ə' : 'a';
 
 
-                corruptPhrase = Regex.Replace(corruptPhrase, "[aə]", twinChar.ToString());
-                corruptPhrase = Regex.Replace(corruptPhrase, "[AƏ]", char.ToUpper(twinChar).ToString());
-                corruptPhrase = Regex.Replace(corruptPhrase, "[ıiuü]", fourChar.ToString());
-                corruptPhrase = Regex.Replace(corruptPhrase, "[IİUÜ]", char.ToUpper(fourChar).ToString());
+                following = Regex.Replace(following, "[aə]", twinChar.ToString());
+                following = Regex.Replace(following, "[AƏ]", char.ToUpper(twinChar).ToString());
+                following = Regex.Replace(following, "[ıiuü]", fourChar.ToString());
+                following = Regex.Replace(following, "[IİUÜ]", char.ToUpper(fourChar).ToString());
             }
 
-            return corruptPhrase;
+            return root+following;
         }
 
         private static CharInfos GetCharInfos(this char c)
@@ -313,7 +318,7 @@ namespace Millify
 
         public enum NumberName : long
         {
-            Sıfır, Bir, İki, Üç, Dörd, Beş, Altı, Yeddi, Səkkiz, Doqquz, On, Iyirmi = 20, Otuz = 30, Qırx = 40, Əlli = 50, Altmış = 60, Yetmiş = 70, Səksən = 80, Doğsan = 90, Yüz = 100, Min = 1000, Milyon = Min * Min, Milyard = Milyon * Min, Trilyon = Milyard * Min, Trilyard = Trilyon * Min, Kvartrilyon = Trilyard * Min
+            Sıfır, Bir, İki, Üç, Dörd, Beş, Altı, Yeddi, Səkkiz, Doqquz, On, Iyirmi = 20, Otuz = 30, Qırx = 40, Əlli = 50, Altmış = 60, Yetmiş = 70, Səksən = 80, Doxsan = 90, Yüz = 100, Min = 1000, Milyon = Min * Min, Milyard = Milyon * Min, Trilyon = Milyard * Min, Trilyard = Trilyon * Min, Kvartrilyon = Trilyard * Min
         }
 
         //TODO support floating numbers
@@ -321,15 +326,15 @@ namespace Millify
         //TODO also write vise versa ( str -> long)
         //TODO support negative numbers
         // O(Log(N))
+
         private static StringBuilder NumberToWordsRecursive(long number, int rank, StringBuilder tail)
         {
             if (number == 0)
-                if (rank == 0) //number is just 0
+                if (rank == 0)
                     return new StringBuilder(((NumberName)number).ToString());
-                else //0 is one of the digits of number. just ignore
+                else
                     return tail;
             if (rank > 0 && rank % 3 == 0 && number % 1000 > 0)
-                // 3rd stages have spacial names ( min, miliyon, miliyard,.. )
                 tail.Insert(0, (NumberName)Math.Pow((int)NumberName.Min, rank / 3) + " ");
 
             if ( /*(rank - 2) >= 0 &&*/ (rank - 2) % 3 == 0 && number % 10 > 0)
@@ -337,16 +342,75 @@ namespace Millify
 
             if (number % 10 != 0 && !(number % 10 == 1 && rank != 0 && ((rank % 3 == 2) || (rank == 3 && number < 10))))
                 tail.Insert(0, ((NumberName)(int)(Math.Pow(10, rank % 3 % 2) * (number % 10))) + " ");
-            //rank % 3 % 2 ignores named stages and 100s, just evaluate 1-9 or 10-90
 
             return NumberToWordsRecursive(number / 10, ++rank, tail);
         }
 
-        public static string NumberToWord(long number)
+
+        public static int GetFloatedRank(double number)
         {
-            return NumberToWordsRecursive(number, 0, new StringBuilder()).ToString().ToLower();
+            var split = number.ToString("F99").Split(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0]);
+            if (split.Length < 2)
+            {
+                return 0;
+            }
+
+            return split[1].TrimEnd('0').Length;
+
+            /*
+            number = number - (int)number;
+            int rank = 0;
+
+            while (number > (int)number + double.Epsilon && !double.IsPositiveInfinity(number))
+            {
+                number *= 10;
+                rank++;
+            }
+
+            return rank;
+            */
+
         }
 
+        public static string NumberToWord(long number)
+        {
+            return NumberToWordsRecursive(number, 0, new StringBuilder()).ToString().TrimEnd().ToLower();
+        }
 
+        public static string NumberToWord(double number, int decimalPlaces = -1)
+        {
+            long integerPart = (long) number;
+
+            double decimalPart = number - integerPart;
+
+            var intergerStr = NumberToWord(integerPart);
+
+
+            int rankShift = decimalPlaces==-1? GetFloatedRank(decimalPart) : decimalPlaces;
+
+
+            long rankFaktor = (long)Math.Pow(10, rankShift);
+            var rankStr = NumberToWord(rankFaktor);
+            var seperatorStr = ConcatWithHarmony(rankStr, "da");//da,də
+
+            long decimalPartShifted = (long) (decimalPart * rankFaktor);
+
+            string decimalStr = NumberToWord(decimalPartShifted);
+
+            return $"{intergerStr} tam {seperatorStr} {decimalStr}".ToLower();
+
+        }
+
+        public static string NumberToCurrency(double number, string integerSuffix = "man.", string decimalSuffix = "qəp.", bool numberToWord = false)
+        {
+            long integerPart = (long) number;
+
+            int decimalPart = (int)Math.Truncate(100*(number-integerPart));
+
+            return $"{(numberToWord ? NumberToWord(integerPart) : integerPart.ToString())} {integerSuffix} {(numberToWord ? NumberToWord(decimalPart) : decimalPart.ToString())} {decimalSuffix}";
+
+        }
+
+        
     }
 }

@@ -8,7 +8,7 @@ namespace Millify
 {
     public static class Millify
     {
-    
+        
         [Flags]
         internal enum CharInfos
         {

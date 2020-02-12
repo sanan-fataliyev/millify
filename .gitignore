@@ -19,3 +19,5 @@ _ReSharper.*
 *.orig
 .DS_Store
 packages/
+.idea/
+

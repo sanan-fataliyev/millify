@@ -8,6 +8,12 @@ namespace Millify
 {
     public static class Millify
     {
+        private const string AzeVowelsUpper = "AIOUEƏİÖÜ";
+        private const string AzeVowelsLower = "aıoueəiöü";
+        private static string AzeAlphaUpper = "ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ";
+        private static string AzeConsonantsUpper = "BCÇDFGĞHXJKQLMNPRSŞTVYZ";
+        private static string AzeConsonantsOrdered = "_HBPCÇDTVFGKĞXJŞZSYẊQKL_M_N_R_";
+
         
         [Flags]
         internal enum CharInfos
@@ -38,20 +44,12 @@ namespace Millify
             return source.ToLower().IndexOf(char.ToLower(c));
         }
 
-        private const string AzeVowelsUpper = "AIOUEƏİÖÜ";
-
-        private const string AzeVowelsLower = "aıoueəiöü";
-
-        private static string AzeAlphaUpper = "ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ";
 
         private static bool IsAzeLetter(char c)
         {
             return IndexOfInsentensive(AzeAlphaUpper, c) != -1;
         }
 
-        private static string AzeConsonantsUpper = "BCÇDFGĞHXJKQLMNPRSŞTVYZ";
-
-        private static string AzeConsonantsOrdered = "_HBPCÇDTVFGKĞXJŞZSYẊQKL_M_N_R_";
 
         private static int VowelIndex(char c)
         {

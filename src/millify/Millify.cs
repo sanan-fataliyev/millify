@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
@@ -11,10 +12,31 @@ namespace Millify
         private const string AzeVowelsUpper = "AIOUEƏİÖÜ";
         private const string AzeVowelsLower = "aıoueəiöü";
         private static string AzeAlphaUpper = "ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ";
+        private static string AzeAlphaLower = "abcçdeəfgğhxıijklmnoöprsştuüvyz";
         private static string AzeConsonantsUpper = "BCÇDFGĞHXJKQLMNPRSŞTVYZ";
         private static string AzeConsonantsOrdered = "_HBPCÇDTVFGKĞXJŞZSYẊQKL_M_N_R_";
 
+
+        private static readonly Dictionary<char, CharInfos> __charInfoCache;
+
+        static Millify()
+        {
+            
+            // initialize cache
+            __charInfoCache = new Dictionary<char, CharInfos>(AzeAlphaLower.Length + AzeAlphaUpper.Length);
+
+            foreach (char c in AzeAlphaUpper)
+            {
+                GetCharInfos(c);
+            }
+            foreach (char c in AzeAlphaUpper)
+            {
+                GetCharInfos(c);
+            }
+        }
         
+        
+
         [Flags]
         internal enum CharInfos
         {
@@ -223,6 +245,11 @@ namespace Millify
 
         private static CharInfos GetCharInfos(this char c)
         {
+            if (__charInfoCache.TryGetValue(c, out var fromCache))
+            {
+                return fromCache;
+            }
+            
             CharInfos result = (CharInfos)0;
 
             if (char.IsSymbol(c))
@@ -242,7 +269,7 @@ namespace Millify
                 {
                     result |= CharInfos.Böyük;
                 }
-                else
+                else if(char.IsLetter(c))
                 {
                     result |= CharInfos.Kiçik;
                 }
@@ -311,6 +338,8 @@ namespace Millify
                 }
 
             }
+
+            __charInfoCache[c] = result;
             return result;
         }
 

@@ -38,7 +38,7 @@ namespace Millify
         
 
         [Flags]
-        internal enum CharInfos
+        public enum CharInfos
         {
             Simvol = 1 << 0,
             Rəqəm = 1 << 1,

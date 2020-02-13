@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "millify", "millify\millify.csproj", "{19F7F0A3-3FAC-412E-BEAA-01B2BC1392B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Millify", "Millify\Millify.csproj", "{63BD393A-3202-4436-9B39-8A2A2C60C997}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "millify.tests", "millify.tests\millify.tests.csproj", "{3E19D954-CAC7-4FC1-B9F5-E76237A71FF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Millify.Tests", "Millify.Tests\Millify.Tests.csproj", "{9F6476D0-A8C4-4A57-9E1B-AE03300B70AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{19F7F0A3-3FAC-412E-BEAA-01B2BC1392B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19F7F0A3-3FAC-412E-BEAA-01B2BC1392B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19F7F0A3-3FAC-412E-BEAA-01B2BC1392B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19F7F0A3-3FAC-412E-BEAA-01B2BC1392B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E19D954-CAC7-4FC1-B9F5-E76237A71FF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E19D954-CAC7-4FC1-B9F5-E76237A71FF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E19D954-CAC7-4FC1-B9F5-E76237A71FF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E19D954-CAC7-4FC1-B9F5-E76237A71FF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63BD393A-3202-4436-9B39-8A2A2C60C997}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63BD393A-3202-4436-9B39-8A2A2C60C997}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63BD393A-3202-4436-9B39-8A2A2C60C997}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63BD393A-3202-4436-9B39-8A2A2C60C997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6476D0-A8C4-4A57-9E1B-AE03300B70AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6476D0-A8C4-4A57-9E1B-AE03300B70AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6476D0-A8C4-4A57-9E1B-AE03300B70AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6476D0-A8C4-4A57-9E1B-AE03300B70AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

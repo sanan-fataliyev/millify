@@ -11,10 +11,12 @@ namespace Millify
     {
         private const string AzeVowelsUpper = "AIOUEƏİÖÜ";
         private const string AzeVowelsLower = "aıoueəiöü";
-        private static string AzeAlphaUpper = "ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ";
-        private static string AzeAlphaLower = "abcçdeəfgğhxıijklmnoöprsştuüvyz";
-        private static string AzeConsonantsUpper = "BCÇDFGĞHXJKQLMNPRSŞTVYZ";
-        private static string AzeConsonantsOrdered = "_HBPCÇDTVFGKĞXJŞZSYẊQKL_M_N_R_";
+        private const string AzeAlphaUpper = "ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ";
+        private const string AzeAlphaLower = "abcçdeəfgğhxıijklmnoöprsştuüvyz";
+        private const string AzeConsonantsUpper   = "BCÇDFGĞHXJKQLMNPRSŞTVYZ";
+        private const string AzeConsonantsOrdered = "_HBPCÇDTVFGKĞXJŞZSYẊQKL_M_N_R_";
+
+        private static readonly HashSet<char> AllAzeLetters = new HashSet<char>(AzeAlphaUpper + AzeAlphaLower);
 
 
         private static readonly Dictionary<char, CharInfos> __charInfoCache;
@@ -176,7 +178,7 @@ namespace Millify
                 result.Append(str.Substring(uponToIndex, match.Index - uponToIndex));
                 result.Append(num);
 
-                var numberSpelling = NumberToWord(long.Parse(num));
+                var numberSpelling = Spell(long.Parse(num));
 
                 var fixedConcat = ConcatWithHarmony(numberSpelling, tail);
                 result.Append(fixedConcat.Substring(fixedConcat.Length-tail.Length));
@@ -342,35 +344,51 @@ namespace Millify
             __charInfoCache[c] = result;
             return result;
         }
+        
 
-        public enum NumberName : long
+        // az.wikipedia.org/wiki/Natural_ədədlər
+        private static readonly string[] names = 
         {
-            Sıfır, Bir, İki, Üç, Dörd, Beş, Altı, Yeddi, Səkkiz, Doqquz, On, Iyirmi = 20, Otuz = 30, Qırx = 40, Əlli = 50, Altmış = 60, Yetmiş = 70, Səksən = 80, Doxsan = 90, Yüz = 100, Min = 1000, Milyon = Min * Min, Milyard = Milyon * Min, Trilyon = Milyard * Min, Trilyard = Trilyon * Min, Kvartrilyon = Trilyard * Min
+            "sıfır", 
+            "bir", "iki", "üç", "dörd", "beş", "altı", "yeddi", "səkkiz", "doqquz",
+            "",
+            "on", "iyirmi", "otuz", "qırx", "əlli", "altmış", "yetmiş", "səksən", "doxsan", 
+            "yüz",
+            "min", "milyon", "milyard", "trilyon", "kvadrilyon", "kvintilyon"
+        };
+        
+        private static string NumberToWords(long number, int rank)
+        {
+            if (number == 0)
+                if (rank == 0) // just zero
+                    return names[0];
+                else
+                    return ""; // ignore zeros in the middle
+            
+            string result = "";
+            int digit = (int)(number % 10);
+            
+            if (rank > 0 && rank % 3 == 0 && number % 1000 > 0)
+                result = " " + names[20 + rank / 3];
+
+            if ((rank - 2) % 3 == 0 && digit > 0)
+                result = " " + names[20] + result;
+
+            if (digit != 0 && !(digit == 1 && (rank % 3 == 2 || rank == 3 && number < 10)))
+                result = " " + names[10 * (rank % 3 % 2) + digit] + result;
+
+            return NumberToWords(number / 10, ++rank) + result;
         }
+
 
         //TODO support floating numbers
         //TODO also write iterative solution, recursive call will cause StackOverFlow exception with too big numbers ( even that numbers aren't named)
         //TODO also write vise versa ( str -> long)
         //TODO support negative numbers
-        // O(Log(N))
-
-        private static StringBuilder NumberToWordsRecursive(long number, int rank, StringBuilder tail)
+        
+        public static string Spell(long number)
         {
-            if (number == 0)
-                if (rank == 0)
-                    return new StringBuilder(((NumberName)number).ToString());
-                else
-                    return tail;
-            if (rank > 0 && rank % 3 == 0 && number % 1000 > 0)
-                tail.Insert(0, (NumberName)Math.Pow((int)NumberName.Min, rank / 3) + " ");
-
-            if ( /*(rank - 2) >= 0 &&*/ (rank - 2) % 3 == 0 && number % 10 > 0)
-                tail.Insert(0, NumberName.Yüz + " ");
-
-            if (number % 10 != 0 && !(number % 10 == 1 && rank != 0 && ((rank % 3 == 2) || (rank == 3 && number < 10))))
-                tail.Insert(0, ((NumberName)(int)(Math.Pow(10, rank % 3 % 2) * (number % 10))) + " ");
-
-            return NumberToWordsRecursive(number / 10, ++rank, tail);
+            return NumberToWords(number, 0).TrimStart();
         }
 
 
@@ -399,10 +417,6 @@ namespace Millify
 
         }
 
-        public static string NumberToWord(long number)
-        {
-            return NumberToWordsRecursive(number, 0, new StringBuilder()).ToString().TrimEnd().ToLower();
-        }
 
         public static string NumberToWord(double number, int decimalPlaces = -1)
         {
@@ -410,19 +424,19 @@ namespace Millify
 
             double decimalPart = number - integerPart;
 
-            var intergerStr = NumberToWord(integerPart);
+            var intergerStr = Spell(integerPart);
 
 
             int rankShift = decimalPlaces==-1? GetFloatedRank(decimalPart) : decimalPlaces;
 
 
             long rankFaktor = (long)Math.Pow(10, rankShift);
-            var rankStr = NumberToWord(rankFaktor);
+            var rankStr = Spell(rankFaktor);
             var seperatorStr = ConcatWithHarmony(rankStr, "da");//da,də
 
             long decimalPartShifted = (long) (decimalPart * rankFaktor);
 
-            string decimalStr = NumberToWord(decimalPartShifted);
+            string decimalStr = Spell(decimalPartShifted);
 
             return $"{intergerStr} tam {seperatorStr} {decimalStr}".ToLower();
 
@@ -434,7 +448,7 @@ namespace Millify
 
             int decimalPart = (int)Math.Truncate(100*(number-integerPart));
 
-            return $"{(numberToWord ? NumberToWord(integerPart) : integerPart.ToString())} {integerSuffix} {(numberToWord ? NumberToWord(decimalPart) : decimalPart.ToString())} {decimalSuffix}";
+            return $"{(numberToWord ? Spell(integerPart) : integerPart.ToString())} {integerSuffix} {(numberToWord ? Spell(decimalPart) : decimalPart.ToString())} {decimalSuffix}";
 
         }
 

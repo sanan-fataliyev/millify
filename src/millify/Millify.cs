@@ -180,7 +180,7 @@ namespace Millify
 
                 var numberSpelling = Spell(long.Parse(num));
 
-                var fixedConcat = ConcatWithHarmony(numberSpelling, tail);
+                var fixedConcat = AddSuffix(numberSpelling, tail);
                 result.Append(fixedConcat.Substring(fixedConcat.Length-tail.Length));
                 uponToIndex = match.Index + match.Length;
             }
@@ -191,7 +191,7 @@ namespace Millify
         }
 
         //ahəng qanunu. 
-        public static string ConcatWithHarmony(string root, string following)
+        public static string AddSuffix(this string root, string suffix)
         {
             //2011-cidən başlayaraq
             //2010-cudan başlayaraq
@@ -236,13 +236,13 @@ namespace Millify
                 char twinChar = lastVowelInfos.HasFlag(CharInfos.İncə) ? 'ə' : 'a';
 
 
-                following = Regex.Replace(following, "[aə]", twinChar.ToString());
-                following = Regex.Replace(following, "[AƏ]", char.ToUpper(twinChar).ToString());
-                following = Regex.Replace(following, "[ıiuü]", fourChar.ToString());
-                following = Regex.Replace(following, "[IİUÜ]", char.ToUpper(fourChar).ToString());
+                suffix = Regex.Replace(suffix, "[aə]", twinChar.ToString());
+                suffix = Regex.Replace(suffix, "[AƏ]", char.ToUpper(twinChar).ToString());
+                suffix = Regex.Replace(suffix, "[ıiuü]", fourChar.ToString());
+                suffix = Regex.Replace(suffix, "[IİUÜ]", char.ToUpper(fourChar).ToString());
             }
 
-            return root+following;
+            return root+suffix;
         }
 
         private static CharInfos GetCharInfos(this char c)
@@ -416,29 +416,26 @@ namespace Millify
             */
 
         }
-
-
+        
         public static string NumberToWord(double number, int decimalPlaces = -1)
         {
             long integerPart = (long) number;
 
             double decimalPart = number - integerPart;
 
-            var intergerStr = Spell(integerPart);
+            var integerStr = Spell(integerPart);
 
-
-            int rankShift = decimalPlaces==-1? GetFloatedRank(decimalPart) : decimalPlaces;
-
+            int rankShift = decimalPlaces ==-1 ? GetFloatedRank(decimalPart) : decimalPlaces;
 
             long rankFaktor = (long)Math.Pow(10, rankShift);
             var rankStr = Spell(rankFaktor);
-            var seperatorStr = ConcatWithHarmony(rankStr, "da");//da,də
+            string etalon = AddSuffix(rankStr, "da"); //da,də
 
             long decimalPartShifted = (long) (decimalPart * rankFaktor);
 
             string decimalStr = Spell(decimalPartShifted);
 
-            return $"{intergerStr} tam {seperatorStr} {decimalStr}".ToLower();
+            return $"{integerStr} tam {etalon} {decimalStr}".ToLower();
 
         }
 

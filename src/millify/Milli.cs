@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Millify
 {
-    public static class Millify
+    public static class Milli
     {
         private const string AzeVowelsUpper = "AIOUEƏİÖÜ";
         private const string AzeVowelsLower = "aıoueəiöü";
@@ -21,7 +20,7 @@ namespace Millify
 
         private static readonly Dictionary<char, CharInfos> __charInfoCache;
 
-        static Millify()
+        static Milli()
         {
             
             // initialize cache

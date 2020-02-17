@@ -8,6 +8,12 @@ namespace Millify
 {
     public static class Milli
     {
+
+        public static bool IncludePositiveSign = false;
+        
+        public const string PositiveSign = "müsbət";
+        public const string NegativeSign = "mənfi";
+        
         private const string AzeVowelsUpper = "AIOUEƏİÖÜ";
         private const string AzeVowelsLower = "aıoueəiöü";
         private const string AzeAlphaUpper = "ABCÇDEƏFGĞHXIİJKQLMNOÖPRSŞTUÜVYZ";
@@ -350,102 +356,114 @@ namespace Millify
         {
             "sıfır", 
             "bir", "iki", "üç", "dörd", "beş", "altı", "yeddi", "səkkiz", "doqquz",
-            "",
             "on", "iyirmi", "otuz", "qırx", "əlli", "altmış", "yetmiş", "səksən", "doxsan", 
             "yüz",
-            "min", "milyon", "milyard", "trilyon", "kvadrilyon", "kvintilyon"
+            "min", "milyon", "milyard", "trilyon", "kvadrilyon", "kvintilyon", "sextilyon", "septilyon", "oktilyon",
+            // can be extended https://tr.wikipedia.org/wiki/Büyük_sayıların_adları
         };
         
-        private static string NumberToWords(long number, int rank)
+        private static string NumberToWords(decimal number, int rank)
         {
             if (number == 0)
                 if (rank == 0) // just zero
                     return names[0];
                 else
-                    return ""; // ignore zeros in the middle
+                    return ""; // ignore other zeros
             
             string result = "";
             int digit = (int)(number % 10);
             
             if (rank > 0 && rank % 3 == 0 && number % 1000 > 0)
-                result = " " + names[20 + rank / 3];
+                result = " " + names[19 + rank / 3];
 
             if ((rank - 2) % 3 == 0 && digit > 0)
-                result = " " + names[20] + result;
+                result = " " + names[19] + result;
 
             if (digit != 0 && !(digit == 1 && (rank % 3 == 2 || rank == 3 && number < 10)))
-                result = " " + names[10 * (rank % 3 % 2) + digit] + result;
-
-            return NumberToWords(number / 10, ++rank) + result;
+                result = " " + names[9 * (rank % 3 % 2) + digit] + result;
+            return NumberToWords(Math.Truncate(number / 10), ++rank) + result;
         }
+
+        private static string NumberToWords(decimal number)
+        {
+            return NumberToWords(number, 0).TrimStart();
+        } 
 
 
         //TODO support floating numbers
-        //TODO also write iterative solution, recursive call will cause StackOverFlow exception with too big numbers ( even that numbers aren't named)
         //TODO also write vise versa ( str -> long)
         //TODO support negative numbers
+
+        public static (string, decimal) SignAndAbs(decimal number)
+        {
+            if (number < 0)
+                return (NegativeSign, 0-number);
+            if(number > 0 && IncludePositiveSign)
+                return (PositiveSign, number);
+            return (string.Empty, number);
+        }
+        
+        public static string Spell(ulong number)
+        {
+            return SignedNumberToWords(number);
+        }
         
         public static string Spell(long number)
         {
-            return NumberToWords(number, 0).TrimStart();
+            return SignedNumberToWords(number);
+        }
+
+        public static string SignedNumberToWords(decimal number)
+        {
+            (string sign, decimal absNumber) = SignAndAbs(number);
+            string abs = NumberToWords(absNumber);
+            if (sign != string.Empty)
+                return $"{sign} {abs}";
+            return abs;
         }
 
 
-        public static int GetFloatedRank(double number)
+        private static int GetFloatedRank(decimal number)
         {
-            var split = number.ToString("F99").Split(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0]);
-            if (split.Length < 2)
+            string[] parts = number.ToString("F99", CultureInfo.InvariantCulture).Split('.');
+            if (parts.Length < 2)
             {
                 return 0;
             }
-
-            return split[1].TrimEnd('0').Length;
-
-            /*
-            number = number - (int)number;
-            int rank = 0;
-
-            while (number > (int)number + double.Epsilon && !double.IsPositiveInfinity(number))
-            {
-                number *= 10;
-                rank++;
-            }
-
-            return rank;
-            */
-
+            return parts[1].TrimEnd('0').Length;
         }
         
-        public static string NumberToWord(double number, int decimalPlaces = -1)
+        public static string Spell(float number, int decimalPlaces = -1)
         {
-            long integerPart = (long) number;
+            return Spell((decimal) number, decimalPlaces);
+        }
 
-            double decimalPart = number - integerPart;
+        public static string Spell(double number, int decimalPlaces = -1)
+        {
+            return Spell((decimal) number, decimalPlaces);
+        }
 
-            var integerStr = Spell(integerPart);
-
+        public static string Spell(decimal number, int decimalPlaces = -1)
+        {
+            decimal integerPart = Math.Truncate(number);
+            decimal decimalPart = number - integerPart;
+            string integer = SignedNumberToWords(integerPart);
             int rankShift = decimalPlaces ==-1 ? GetFloatedRank(decimalPart) : decimalPlaces;
-
-            long rankFaktor = (long)Math.Pow(10, rankShift);
-            var rankStr = Spell(rankFaktor);
-            string etalon = AddSuffix(rankStr, "da"); //da,də
-
-            long decimalPartShifted = (long) (decimalPart * rankFaktor);
-
-            string decimalStr = Spell(decimalPartShifted);
-
-            return $"{integerStr} tam {etalon} {decimalStr}".ToLower();
-
+            if (rankShift <= 0)
+                return integer;
+            decimal rank = (decimal)Math.Pow(10, rankShift);
+            string rankStr = NumberToWords(rank);
+            string etalon = AddSuffix(rankStr, "da"); //onda, yüzdə, mində, ...
+            decimal decimalPartShifted = (decimalPart * rank);
+            string decimalStr = NumberToWords(decimalPartShifted);
+            return $"{integer} tam {etalon} {decimalStr}".ToLower();
         }
 
         public static string NumberToCurrency(double number, string integerSuffix = "man.", string decimalSuffix = "qəp.", bool numberToWord = false)
         {
             long integerPart = (long) number;
-
             int decimalPart = (int)Math.Truncate(100*(number-integerPart));
-
             return $"{(numberToWord ? Spell(integerPart) : integerPart.ToString())} {integerSuffix} {(numberToWord ? Spell(decimalPart) : decimalPart.ToString())} {decimalSuffix}";
-
         }
 
         

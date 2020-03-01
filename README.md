@@ -79,14 +79,14 @@ səksən altı tam onda altı -> 86.6
 mənfi iki yüz iyirmi iki tam on mində yüz iyirmi beş -> -222.0125
 ```
 
-vəə biraz fan 
+vəə biraz fun 
 <img src="img/plain_math.gif">
 ---
 Maksimum əlçatanlıq üçün aşağıdaki dillərdə kodlar əlavə etdim:
-- [python (tam)](/src/python/milli.py)
-- [c# (yarımçıq)](/src/csharp/Millify/Milli.cs)
-- [javascript (yarımçıq)](src/js/milli.js)
-- [Go (yarımçıq)](/src/go/milli.go)
+- [python](/src/python/milli.py)
+- [c#](/src/csharp/Millify/Milli.cs)
+- [javascript (bəsit)](src/js/milli.js)
+- [Go (bəsit)](/src/go/milli.go)
 
 
 ### Təbii vs Bank mode

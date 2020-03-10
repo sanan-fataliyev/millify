@@ -9,7 +9,7 @@ function _numToWords(number, rank, bankMode) {
         return '';
     let tail = '';
     let digit = number % 10;
-    if (digit != 0 && (bankMode || !(digit == 1 && (rank % 3 == 2 || rank == 3 && number < 10))))
+    if (digit != 0 && (bankMode || !(digit == 1 && (rank % 3 == 2 || rank == 3 && number % 1000 < 10))))
         tail = names[9 * (rank % 3 % 2) + digit] + ' ';
     if (rank % 3 == 2 && digit > 0)
         tail += names[19] + ' ';

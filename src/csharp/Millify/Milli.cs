@@ -63,8 +63,8 @@ namespace Millify
             
             string tail = "";
             int digit = (int)(number % 10);
-            
-            if (digit != 0 && (bankMode || !(digit == 1 && (rank % 3 == 2 || rank == 3 && number < 10))))
+
+            if (digit != 0 && (bankMode || !(digit == 1 && (rank % 3 == 2 || rank == 3 && number%1000 < 10))))
                 tail =  Names[9 * (rank % 3 % 2) + digit] + " ";
 
             if (rank % 3 == 2 && digit > 0)

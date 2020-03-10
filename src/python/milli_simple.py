@@ -12,7 +12,7 @@ def num_to_words(num, rank=0, bank_mode=False):
         return ''
     digit = num % 10
     tail = ''
-    if digit != 0 and (bank_mode or not (digit == 1 and (rank % 3 == 2 or rank == 3 and num < 10))):
+    if digit != 0 and (bank_mode or not (digit == 1 and (rank % 3 == 2 or rank == 3 and num % 1000 < 10))):
         tail = _names[9 * (rank % 3 % 2) + digit] + ' '
     if rank % 3 == 2 and digit > 0:
         tail += _names[19] + ' '

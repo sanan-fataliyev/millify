@@ -14,7 +14,7 @@ def num_to_words(num, bank_mode=False):
     while num:
         local = ''
         digit = num % 10
-        if digit != 0 and (bank_mode or not (digit == 1 and (i % 3 == 2 or i == 3 and num < 10))):
+        if digit != 0 and (bank_mode or not (digit == 1 and (i % 3 == 2 or i == 3 and num % 1000 < 10))):
             local = _names[9 * (i % 3 % 2) + digit] + ' '
         if i % 3 == 2 and digit > 0:
             local += _names[19] + ' '

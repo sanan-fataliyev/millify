@@ -53,6 +53,7 @@ namespace Millify.Tests
         [InlineData(999_999, "doqquz yüz doxsan doqquz min doqquz yüz doxsan doqquz")]
         
         [InlineData(1_000_000, "bir milyon")]
+        [InlineData(9_001_001, "doqquz milyon min bir")]
         [InlineData(123_456_789, "yüz iyirmi üç milyon dörd yüz əlli altı min yeddi yüz səksən doqquz")]
         
         // https://youtu.be/ZoN7-pMdQdg

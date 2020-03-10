@@ -13,7 +13,7 @@ def num_to_words(num, bank_mode=False, rank=0):
         return ''
     digit = num % 10
     tail = ''
-    if digit != 0 and (bank_mode or not (digit == 1 and (rank % 3 == 2 or rank == 3 and num < 10))):
+    if digit != 0 and (bank_mode or not (digit == 1 and (rank % 3 == 2 or rank == 3 and num % 1000 < 10))):
         tail = names[9 * (rank % 3 % 2) + digit] + ' '
     if rank % 3 == 2 and digit > 0:
         tail += names[19] + ' '
@@ -44,6 +44,7 @@ print(num_to_words(987654321)) # doqquz yüz səksən yeddi milyon altı yüz ə
 86.6 -> səksən altı tam onda altı
 99.99 -> doxsan doqquz tam yüzdə doxsan doqquz
 -273.15 -> mənfi iki yüz yetmiş üç tam yüzdə on beş
+9001001 -> doqquz milyon min bir
 4294967296 -> dörd milyard iki yüz doxsan dörd milyon doqquz yüz altmış yeddi min iki yüz doxsan altı
 ============================== ordinals ==============================
 1 -> 1-ci

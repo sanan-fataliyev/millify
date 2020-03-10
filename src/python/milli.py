@@ -49,7 +49,7 @@ def _num_to_words(num, bank_mode=False):
     while num and i < _max_rank:
         local = ''
         digit = num % 10
-        if digit != 0 and (bank_mode or not (digit == 1 and (i % 3 == 2 or i == 3 and num < 10))):
+        if digit != 0 and (bank_mode or not (digit == 1 and (i % 3 == 2 or i == 3 and num % 1000 < 10))):
             local = _names[9 * (i % 3 % 2) + digit] + ' '
         if i % 3 == 2 and digit > 0:
             local += _names[19] + ' '
@@ -137,7 +137,7 @@ def num_to_currency(num, bank_mode=False, nominal='manat', coin_unit='qəpik'):
 if __name__ == '__main__':
 
     print('=' * 30, 'number to words', '=' * 30)
-    numbers = [0, 1, 2, 3, 3.14, 86.6, 99.99, -273.15, 1<<32]
+    numbers = [0, 1, 2, 3, 3.14, 86.6, 99.99, -273.15, 9001001, 1<<32]
 
     for number in numbers:
         print(number, '->', num_to_words(number))
